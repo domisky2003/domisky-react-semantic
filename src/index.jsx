@@ -62,7 +62,7 @@ const fetchTodo = async (todoId) => {
   return todo;
 };
 
-const useCachedTodo = (id) => {
+const useTodo = (id) => {
   const [loading, setLoading] = React.useState(false);
   const [todo, setTodo] = React.useState(null);
   React.useEffect(
@@ -83,7 +83,7 @@ const useCachedTodo = (id) => {
 
 const App = () => {
   const [todoId, setTodoId] = React.useState("1");
-  const { loading, todo } = useCachedTodo(todoId);
+  const { loading, todo } = useTodo(todoId);
   console.log({ loading, todo });
   return (
     <Layout>
