@@ -21,15 +21,15 @@ const Layout = ({ children }) => {
   );
 };
 
-const SelectId = ({setLoading,todoId}) => {
-
-  const changeId = 
+const SelectId = ({ todoId, setTodoId }) => {
+  const changeId = React.useCallback(
     (event) => {
-      todoId.current = event.target.value;
-      setLoading(true)
-    }
+      setTodoId(event.target.value);
+    },
+    [setTodoId]
+  );
   return (
-    <select value={todoId.current} onChange={changeId}>
+    <select value={todoId} onChange={changeId}>
       <option value="1">1</option>
       <option value="2">2</option>
       <option value="3">3</option>
@@ -80,7 +80,8 @@ const fetchTodo = async (todoId) => {
   return todo;
 };
 
-const useTodo = (todoId,setLoading) => {
+const useTodo = (todoId) => {
+  const [loading, setLoading] = React.useState(false);
   const [todo, setTodo] = React.useState(null);
   
   React.useEffect(
@@ -94,50 +95,39 @@ const useTodo = (todoId,setLoading) => {
          * This seems like a problem with using mutable state and setters/
          * getters, not a problem with React...
          */
-        
-        //await setLoading(true);
-        //await setTodo(null); 
-        const newTodo = await fetchTodo(todoId.current);
-        
+        await setLoading(true);
+        await setTodo(null); 
+        const newTodo = await fetchTodo(todoId);
         await setTodo(newTodo);
         await setLoading(false);
-        console.log("i ran on mount")
          
       };
       getTodo();
     },
-    [todoId.current]
+    [todoId]
   );
-  return { todo };
+  return { loading, todo };
 };
-
 
 // Boilerplate Rendering code {{{
 const App = () => {
-  const todoId = React.useRef(1);
-  const [loading, setLoading] = React.useState(false);
-  const todo = useTodo(todoId,setLoading);
-  console.log( {todoId: todoId.current, loading: loading, todo:todo});
+  const [todoId, setTodoId] = React.useState("1");
+  const { loading, todo } = useTodo(todoId);
+  console.log( {todoId: todoId, loading: loading, todo:todo});
   return (
     <Layout>
       <h1>Hello, React Semantics!</h1>
-      <SelectId setLoading={setLoading} todoId={todoId} />
-      <h2>Todo ID: {todoId.current}</h2>
+      <SelectId todoId={todoId} setTodoId={setTodoId} />
+      <h2>Todo ID: {todoId}</h2>
       {loading ? <h2>Loading...</h2> : <ApiResult todo={todo} />}
     </Layout>
   );
 };
 
-
-  function App3(){
-    const [count, setCount] = React.useState(0);
-  return (
-    <button onClick={() => setCount(count + 1)}>Count : {count}</button>
-  )
-  }
-
 ReactDOM.render(
-    <App3/>,
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
   document.getElementById("root")
 );
-
+/</Layout>/ }}}
